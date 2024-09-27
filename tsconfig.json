@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "incremental": false,
+    "target": "es2016",
+    "jsx": "preserve",
+    "lib": [
+      "DOM",
+      "ESNext",
+      "es5",
+      "es6",
+      "dom",
+      "dom.iterable",
+      "ES2022"
+    ],
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "paths": {
+      "~/*": [
+        "src/*"
+      ]
+    },
+    "resolveJsonModule": true,
+    "types": [
+      "vite/client"
+    ],
+    "strict": true,
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
