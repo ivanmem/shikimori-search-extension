@@ -1,30 +1,32 @@
-<script setup lang="ts">
-import { useToggle } from '@vueuse/core'
+<script lang="ts" setup>
 import 'uno.css'
+import { disableExtension, sitesStorage } from "~/logic";
+import { useShikimoriMetaName } from "~/composables/useShikimoriMetaName";
 
-const [show, toggle] = useToggle(false)
+const { el, metaName } = useShikimoriMetaName()
+
+const sites = computed(() => sitesStorage.value.map(url => {
+  try {
+    return new URL(url + escape(metaName.value));
+  } catch (e) {
+    console.log({ e })
+    return { host: 'error' }
+  }
+}))
 </script>
 
 <template>
-  <div class="fixed right-0 bottom-0 m-5 z-100 flex items-end font-sans select-none leading-1em">
-    <div
-      class="bg-white text-gray-800 rounded-lg shadow w-max h-min"
-      p="x-4 y-2"
-      m="y-auto r-2"
-      transition="opacity duration-300"
-      :class="show ? 'opacity-100' : 'opacity-0'"
-    >
-      <h1 class="text-lg">
-        Vitesse WebExt
-      </h1>
-      <SharedSubtitle />
+  <teleport v-if="!disableExtension && el" :to="el" defer>
+    <div v-for="site of sites" :key="site.toString()" class="b-external_link official_site b-menu-line shiki-search-extension">
+      <a
+          v-if="site"
+          :href="site.toString()"
+          class="b-link"
+      >
+        {{ site.host }}
+      </a>
     </div>
-    <button
-      class="flex w-10 h-10 rounded-full shadow cursor-pointer border-none"
-      bg="teal-600 hover:teal-700"
-      @click="toggle()"
-    >
-      <pixelarticons-power class="block m-auto text-white text-lg" />
-    </button>
-  </div>
+  </teleport>
 </template>
+<style lang="scss">
+</style>

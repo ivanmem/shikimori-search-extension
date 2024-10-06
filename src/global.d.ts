@@ -6,3 +6,6 @@ declare module '*.vue' {
   const component: any
   export default component
 }
+
+/// <reference types="navigation-api-types" />
+

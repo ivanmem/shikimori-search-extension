@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { storageDemo } from '~/logic/storage'
+
+import { metaNameStorage } from "~/logic";
 
 function openOptionsPage() {
   browser.runtime.openOptionsPage()
@@ -13,10 +14,10 @@ function openOptionsPage() {
     <SharedSubtitle />
 
     <button class="btn mt-2" @click="openOptionsPage">
-      Open Options
+      Открыть параметры
     </button>
     <div class="mt-2">
-      <span class="opacity-50">Storage:</span> {{ storageDemo }}
+      <span class="opacity-50">Текущий поиск:</span> {{ metaNameStorage }}
     </div>
   </main>
 </template>

@@ -1,15 +1,15 @@
 import type { App } from 'vue'
 
 export function setupApp(app: App) {
-  // Inject a globally available `$app` object in template
+  // Внедрить глобально доступный объект $app в шаблон.
   app.config.globalProperties.$app = {
     context: '',
   }
 
-  // Provide access to `app` in script setup with `const app = inject('app')`
+  // Предоставьте доступ к приложению в настройке скрипта с помощью `const app = inject('app')`
   app.provide('app', app.config.globalProperties.$app)
 
-  // Here you can install additional plugins for all contexts: popup, options page and content-script.
+  // Здесь вы сможете установить дополнительные плагины для всех контекстов: всплывающего окна, страницы параметров и контент-скрипта.
   // example: app.use(i18n)
   // example excluding content-script context: if (context !== 'content-script') app.use(i18n)
 }

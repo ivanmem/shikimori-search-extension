@@ -12,7 +12,7 @@ if (import.meta.hot) {
 // remove or turn this off if you don't use side panel
 const USE_SIDE_PANEL = true
 
-// to toggle the sidepanel with the action button in chromium:
+// для переключения боковой панели с помощью кнопки действия в хроме:
 if (USE_SIDE_PANEL) {
   // @ts-expect-error missing types
   browser.sidePanel

@@ -44,7 +44,7 @@ export async function getManifest() {
     content_scripts: [
       {
         matches: [
-          '<all_urls>',
+          'https://*.shikimori.one/*',
         ],
         js: [
           'dist/contentScripts/index.global.js',

@@ -1,7 +1,7 @@
 import { isFirefox, isForbiddenUrl } from '~/env'
 
-// Firefox fetch files from cache instead of reloading changes from disk,
-// hmr will not work as Chromium based browser
+// Firefox извлекает файлы из кеша вместо перезагрузки изменений с диска,
+// hmr не будет работать как браузер на основе Chromium.
 browser.webNavigation.onCommitted.addListener(({ tabId, frameId, url }) => {
   // Filter out non main window events.
   if (frameId !== 0)
