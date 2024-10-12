@@ -3,9 +3,10 @@
 //   browser.runtime.openOptionsPage()
 // }
 
-import { disableExtension, metaNameStorage, sitesStorage } from "~/logic";
+import { disableExtension, metaNameStorage, sitesStorage } from '~/logic'
+import { templateSearch } from '~/common/consts'
 
-const templateSearch = "gurren%20lagann"
+const templateSearchValue = 'gurren%20lagann'
 const suggestions = [
   '/search?q=',
   '/search?query=',
@@ -31,7 +32,6 @@ const tab = ref<any>()
 
 const customSearchPath = ref('')
 
-
 function getNextSuggestion() {
   const suggestion = checkSuggestions.value[checkIndex.value]
   checkIndex.value++
@@ -39,6 +39,7 @@ function getNextSuggestion() {
 }
 
 function addSite() {
+  resetAdd()
   let site = newSite.value
   if (!site) {
     return
@@ -48,7 +49,11 @@ function addSite() {
     site = `https://${site}`
   }
 
-  resetAdd()
+  if (site.includes(templateSearch)) {
+    onSave(site)
+    return
+  }
+
   checkSite.value = site
   onCheckNext()
 }
@@ -63,21 +68,21 @@ function resetAdd() {
 function onCheckNext() {
   checkSuggestion.value = getNextSuggestion()
   if (checkSuggestion.value) {
-    window.open(checkSiteAndSuggestion.value + templateSearch, '_blank')
+    window.open(checkSiteAndSuggestion.value + templateSearchValue, '_blank')
   }
 }
 
-function onSave() {
-  sitesStorage.value.push(checkSiteAndSuggestion.value)
+function onSave(site: string) {
+  sitesStorage.value.push(site)
   resetAdd()
 }
 
-declare const chrome: any;
+declare const chrome: any
 
 async function nextUrl() {
-  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true })
   if (checkSiteAndSuggestion.value === tab.url || checkSiteAndSuggestion.value === tab.pendingUrl) {
-    chrome.tabs.remove(tab.id);
+    chrome.tabs.remove(tab.id)
   }
 
   onCheckNext()
@@ -99,8 +104,10 @@ function saveCustomUrl() {
 
 <template>
   <main class="w-full px-4 py-5 text-gray-700">
-    <Logo/>
-    <h3 class="text-center">Поисковое Расширение для Shikimori</h3>
+    <Logo />
+    <h3 class="text-center">
+      Поисковое Расширение для Shikimori
+    </h3>
     <div class="popup">
       <div class="form-group">
         <div class="flex gap-2 mb-1">
@@ -109,7 +116,7 @@ function saveCustomUrl() {
         </div>
 
         <label for="new-site">Введите URL сайта</label>
-        <input id="new-site" v-model="newSite" placeholder="https://example.com" type="text">
+        <input id="new-site" v-model="newSite" :placeholder="`https://google.com/search?q=${templateSearch}`" type="text">
         <button @click="addSite">
           Добавить
         </button>
@@ -128,9 +135,9 @@ function saveCustomUrl() {
       </div>
 
       <div v-if="checkSuggestion" class="flex self-start justify-self-start flex-col gap-col-1">
-        <h3>Попытка поиска:<br/> {{ checkSiteAndSuggestion + templateSearch }} <br> Хотите сохранить этот вариант?</h3>
+        <h3>Ваша ссылка не содержит {{ templateSearch }}, поэтому попробуем подобрать ссылку автоматически. Попытка поиска:<br> {{ checkSiteAndSuggestion + templateSearch }} <br> Нашёлся ли {{ templateSearchValue }}?</h3>
         <div class="flex gap-col-2">
-          <button @click="onSave">
+          <button @click="onSave(checkSiteAndSuggestion)">
             Cохранить
           </button>
           <button @click="nextUrl">
@@ -141,7 +148,8 @@ function saveCustomUrl() {
 
       <div v-if="checkIndex > checkSuggestions.length">
         <h3>Все предсказанные варианты не сработали :(</h3>
-        <p>Пожалуйста, введите полную ссылку. Пример: <code>https://example.com/search?q={{ templateSearch }}</code>
+        <p>
+          Пожалуйста, введите полную ссылку (без текста или с таким же как в примере). Пример: <code>https://example.com/search?q={{ templateSearch }}</code>
         </p>
         <input v-model="customSearchPath" placeholder="Полный путь" type="text">
         <button @click="saveCustomUrl">
