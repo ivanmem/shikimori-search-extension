@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@varlet/ui':
+        specifier: ^3.5.4
+        version: 3.5.4(vue@3.4.38(typescript@5.5.4))
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^2.27.0
@@ -781,6 +785,9 @@ packages:
   '@polka/url@1.0.0-next.28':
     resolution: {integrity: sha512-8LduaNlMZGwdZ6qWrKlfa+2M4gahzFkprZiAt2TF8uS0qQgBizKXpXURqvTJ4WtmupWxaLqjRb2UCTe72mu+Aw==}
 
+  '@popperjs/core@2.11.8':
+    resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
+
   '@rollup/pluginutils@5.1.2':
     resolution: {integrity: sha512-/FIdS3PyZ39bjZlwqFnWqCOVnW7o963LtKMwQOD0NhQqw22gSr2YY1afu3FxRip4ZCZNsD5jq6Aaz6QV3D/Njw==}
     engines: {node: '>=14.0.0'}
@@ -1128,6 +1135,22 @@ packages:
     resolution: {integrity: sha512-ES39SL7+0UDTM5IvIiDVodH4duUIzGXug/bhuDHHhhtUBoengH+Oe59jURzRChDj4Pf3cyqMtTwo5amoz3lV2Q==}
     peerDependencies:
       vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0-0
+
+  '@varlet/icons@3.5.4':
+    resolution: {integrity: sha512-ACqIuViGwDyKutKrbRsXnRuJPkpc7lg5LeILpLgQQYcZCRdM7XkdR+R3rpyUD7ASdg4PZhcVnxfWUmeUfqtY7Q==}
+
+  '@varlet/shared@3.5.4':
+    resolution: {integrity: sha512-SDO2rXLL1zR6K7vxxGKCilSnWiivxyw5rDmT5NhL5flFHzs2Ck12WfWkhEyGXuxz+oyaTyB76UUEJXwFP1a/9w==}
+
+  '@varlet/ui@3.5.4':
+    resolution: {integrity: sha512-Uw35GptQL/9fUHSRMyatD1DeEhXX7li1lNpoP3IddYpfFxruzU2q0VBFygDhftYj1W7YiVqulfXUmINiTkcPJA==}
+    peerDependencies:
+      vue: ^3.2.0
+
+  '@varlet/use@3.5.4':
+    resolution: {integrity: sha512-MEE77WuTBm0Z8ZgjjN/sctC4GAoKIer/iqen71vXBuRpnE17ifneWXkT1GqZncWzCPy9hNnqlqwPrbVCD6b4Fg==}
+    peerDependencies:
+      vue: ^3.2.0
 
   '@vitejs/plugin-vue@5.1.2':
     resolution: {integrity: sha512-nY9IwH12qeiJqumTCLJLE7IiNx7HZ39cbHaysEUd+Myvbz9KAqd2yq+U01Kab1R/H1BmiyM2ShTYlNH32Fzo3A==}
@@ -1726,6 +1749,9 @@ packages:
   data-view-byte-offset@1.0.0:
     resolution: {integrity: sha512-t/Ygsytq+R995EJ5PZlD4Cu56sWa8InXySaViRzw9apusqsOO2bQP+SbYzAhR0pFKoB+43lYy8rWban9JSuXnA==}
     engines: {node: '>= 0.4'}
+
+  dayjs@1.11.13:
+    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
 
   debounce@1.2.1:
     resolution: {integrity: sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug==}
@@ -5311,6 +5337,8 @@ snapshots:
 
   '@polka/url@1.0.0-next.28': {}
 
+  '@popperjs/core@2.11.8': {}
+
   '@rollup/pluginutils@5.1.2(rollup@4.22.5)':
     dependencies:
       '@types/estree': 1.0.6
@@ -5747,6 +5775,25 @@ snapshots:
     transitivePeerDependencies:
       - rollup
       - supports-color
+
+  '@varlet/icons@3.5.4': {}
+
+  '@varlet/shared@3.5.4': {}
+
+  '@varlet/ui@3.5.4(vue@3.4.38(typescript@5.5.4))':
+    dependencies:
+      '@popperjs/core': 2.11.8
+      '@varlet/icons': 3.5.4
+      '@varlet/shared': 3.5.4
+      '@varlet/use': 3.5.4(vue@3.4.38(typescript@5.5.4))
+      dayjs: 1.11.13
+      decimal.js: 10.4.3
+      vue: 3.4.38(typescript@5.5.4)
+
+  '@varlet/use@3.5.4(vue@3.4.38(typescript@5.5.4))':
+    dependencies:
+      '@varlet/shared': 3.5.4
+      vue: 3.4.38(typescript@5.5.4)
 
   '@vitejs/plugin-vue@5.1.2(vite@5.4.2(@types/node@22.5.0)(sass-embedded@1.79.3))(vue@3.4.38(typescript@5.5.4))':
     dependencies:
@@ -6454,6 +6501,8 @@ snapshots:
       call-bind: 1.0.7
       es-errors: 1.3.0
       is-data-view: 1.0.1
+
+  dayjs@1.11.13: {}
 
   debounce@1.2.1: {}
 

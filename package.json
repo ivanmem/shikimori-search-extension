@@ -76,5 +76,8 @@
   },
   "lint-staged": {
     "*": "eslint --fix"
+  },
+  "dependencies": {
+    "@varlet/ui": "^3.5.4"
   }
 }

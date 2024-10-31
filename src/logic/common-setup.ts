@@ -1,4 +1,5 @@
 import type { App } from 'vue'
+import Varlet, { StyleProvider, Themes } from "@varlet/ui";
 
 export function setupApp(app: App) {
   // Внедрить глобально доступный объект $app в шаблон.
@@ -12,4 +13,6 @@ export function setupApp(app: App) {
   // Здесь вы сможете установить дополнительные плагины для всех контекстов: всплывающего окна, страницы параметров и контент-скрипта.
   // example: app.use(i18n)
   // example excluding content-script context: if (context !== 'content-script') app.use(i18n)
+  app.use(Varlet)
+  StyleProvider(Themes.dark)
 }

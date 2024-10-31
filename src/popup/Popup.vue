@@ -1,6 +1,6 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 
-import { metaNameStorage } from "~/logic";
+import {metaNameStorage} from "~/logic";
 
 function openOptionsPage() {
   browser.runtime.openOptionsPage()
@@ -8,16 +8,16 @@ function openOptionsPage() {
 </script>
 
 <template>
-  <main class="w-[300px] px-4 py-5 text-center text-gray-700">
-    <Logo />
+  <main style="padding: 1.25rem 1rem; text-align: center; color: #374151; width: 300px;">
+    <Logo/>
     <div>Popup</div>
-    <SharedSubtitle />
+    <SharedSubtitle/>
 
-    <button class="btn mt-2" @click="openOptionsPage">
+    <VarButton style="margin-top: 0.5rem;" @click="openOptionsPage">
       Открыть параметры
-    </button>
-    <div class="mt-2">
-      <span class="opacity-50">Текущий поиск:</span> {{ metaNameStorage }}
+    </VarButton>
+    <div style="margin-top: 0.5rem;">
+      <span style="opacity: 0.5;">Текущий поиск:</span> {{ metaNameStorage }}
     </div>
   </main>
 </template>
