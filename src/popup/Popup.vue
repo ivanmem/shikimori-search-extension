@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 
-import {metaNameStorage} from "~/logic";
 
 function openOptionsPage() {
   browser.runtime.openOptionsPage()
@@ -16,8 +15,5 @@ function openOptionsPage() {
     <VarButton style="margin-top: 0.5rem;" @click="openOptionsPage">
       Открыть параметры
     </VarButton>
-    <div style="margin-top: 0.5rem;">
-      <span style="opacity: 0.5;">Текущий поиск:</span> {{ metaNameStorage }}
-    </div>
   </main>
 </template>

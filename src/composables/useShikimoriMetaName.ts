@@ -1,17 +1,18 @@
-import { onUnmounted, ref, watch } from 'vue'
-import { useBrowserLocation, useMutationObserver } from '@vueuse/core'
-import { disableExtension, metaNameStorage } from "~/logic";
-import { onWebExtensionStoragesMounted } from "~/composables/useWebExtensionStorage";
+import {onUnmounted, ref, watch} from 'vue'
+import {useBrowserLocation, useMutationObserver} from '@vueuse/core'
+import {disableExtension} from "~/logic";
+import {onWebExtensionStoragesMounted} from "~/composables/useWebExtensionStorage";
 
 export function useShikimoriMetaName() {
     const el = ref<HTMLDivElement | undefined>()
     const location = useBrowserLocation()
+    const metaName = ref<string>('')
 
-    watch(location, handleUrlChange, { deep: true })
+    watch(location, updateMetaInfo, {deep: true})
 
     onWebExtensionStoragesMounted(() => {
-        window.addEventListener('popstate', handleUrlChange)
-        document.addEventListener('turbolinks:load', handleUrlChange)
+        window.addEventListener('popstate', updateMetaInfo)
+        document.addEventListener('turbolinks:load', updateMetaInfo)
         updateMetaInfo()
         useMutationObserver(document.body, mutationCallback, {
             childList: true,
@@ -20,8 +21,8 @@ export function useShikimoriMetaName() {
     })
 
     onUnmounted(() => {
-        window.removeEventListener('popstate', handleUrlChange)
-        document.removeEventListener('turbolinks:load', handleUrlChange)
+        window.removeEventListener('popstate', updateMetaInfo)
+        document.removeEventListener('turbolinks:load', updateMetaInfo)
     })
 
 
@@ -45,10 +46,6 @@ export function useShikimoriMetaName() {
         }
     }
 
-    function handleUrlChange() {
-        updateMetaInfo()
-    }
-
     function updateMetaInfo() {
         if (disableExtension.value) {
             return
@@ -69,10 +66,10 @@ export function useShikimoriMetaName() {
             link.remove();
         })
 
-        metaNameStorage.value = document.querySelector<HTMLMetaElement>("header > meta[itemprop=name]")?.content ?? ''
+        metaName.value = document.querySelector<HTMLMetaElement>("header > meta[itemprop=name]")?.content ?? ''
         el.value = targetEl ?? undefined
     }
 
-    return { el, metaName: metaNameStorage }
+    return {el, metaName}
 }
 
