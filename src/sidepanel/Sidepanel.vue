@@ -1,8 +1,4 @@
 <script lang="ts" setup>
-// function openOptionsPage() {
-//   browser.runtime.openOptionsPage()
-// }
-
 import {useArrayUnique} from "@vueuse/core";
 import {disableExtension, sitesStorage} from '~/logic'
 import {templateSearch} from '~/common/consts'
