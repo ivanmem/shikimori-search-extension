@@ -1,37 +1,41 @@
 <script lang="ts" setup>
-import {disableExtension, sitesStorage} from '~/logic'
-import {useShikimoriMetaName} from '~/composables/useShikimoriMetaName'
-import {templateSearch} from '~/common/consts'
-import {getIconUrl} from "~/utils/getIconUrl";
+import { disableExtension, sitesStorage } from '~/logic'
+import { useShikimoriMetaName } from '~/composables/useShikimoriMetaName'
+import { templateSearch } from '~/common/consts'
+import { getIconUrl } from '~/utils/getIconUrl'
 
-const {el, metaName} = useShikimoriMetaName()
+const { el, metaName } = useShikimoriMetaName()
 
 const sites = computed(() => sitesStorage.value.map((url) => {
   try {
     const name = escape(metaName.value)
     if (url.includes(templateSearch)) {
       url = url.replace(templateSearch, name)
-    } else {
+    }
+    else {
       url += name
     }
 
     return new URL(url)
-  } catch (e) {
-    console.error({e})
-    return {host: 'error'}
+  }
+  catch (e) {
+    console.error({ e })
+    return { host: 'error' }
   }
 }))
 </script>
 
 <template>
   <teleport v-if="!disableExtension && el" :to="el" defer>
-    <div v-for="site of sites" :key="site.toString()"
-         class="b-external_link official_site b-menu-line shiki-search-extension">
+    <div
+      v-for="site of sites" :key="site.toString()"
+      class="b-external_link official_site b-menu-line shiki-search-extension"
+    >
       <a
-          v-if="site"
-          :href="site.toString()"
-          :style="{'--b-link-icon': `url(${getIconUrl(site.toString())})`}"
-          class="b-link"
+        v-if="site"
+        :href="site.toString()"
+        :style="{ '--b-link-icon': `url(${getIconUrl(site.toString())})` }"
+        class="b-link"
       >
         {{ site.host }}
       </a>
@@ -44,6 +48,7 @@ const sites = computed(() => sitesStorage.value.map((url) => {
   .b-link {
     &::before {
       background: var(--b-link-icon) no-repeat !important;
+      background-size: contain !important;
     }
   }
 }
