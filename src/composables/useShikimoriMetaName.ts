@@ -59,14 +59,15 @@ export function useShikimoriMetaName() {
     const targetEl = document.querySelector<HTMLDivElement>(
       ".block:has(.b-external_link), .block.block-shiki-search-extension",
     );
-    if (!targetEl || init) {
+    const classContains = Boolean(
+      targetEl?.classList.contains("block-shiki-search-extension"),
+    );
+    if (!targetEl || (init && classContains)) {
       el.value = targetEl ?? undefined;
       return;
     }
 
-    init = true;
-
-    if (!targetEl.classList.contains("block-shiki-search-extension")) {
+    if (!classContains) {
       targetEl.classList.add("block-shiki-search-extension");
     }
 
@@ -75,6 +76,7 @@ export function useShikimoriMetaName() {
       link.remove();
     });
     el.value = targetEl ?? undefined;
+    init = true;
   }
 
   return { el, metaName };
