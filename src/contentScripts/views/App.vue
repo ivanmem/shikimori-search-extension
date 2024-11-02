@@ -1,43 +1,45 @@
 <script lang="ts" setup>
-import { disableExtension, sitesStorage } from '~/logic'
-import { useShikimoriMetaName } from '~/composables/useShikimoriMetaName'
-import { templateSearch } from '~/common/consts'
-import { getIconUrl } from '~/utils/getIconUrl'
+import { disableExtension, sitesStorage } from "~/logic";
+import { useShikimoriMetaName } from "~/composables/useShikimoriMetaName";
+import { templateSearch } from "~/common/consts";
+import { getFaviconUrl } from "~/utils/getFaviconUrl";
+import { getUrlHost } from "~/utils/getUrlHost";
 
-const { el, metaName } = useShikimoriMetaName()
+const { el, metaName } = useShikimoriMetaName();
 
-const sites = computed(() => sitesStorage.value.map((url) => {
-  try {
-    const name = escape(metaName.value)
-    if (url.includes(templateSearch)) {
-      url = url.replace(templateSearch, name)
-    }
-    else {
-      url += name
-    }
+const sites = computed(() => {
+  return sitesStorage.value
+    .filter((href) => href.length > 0)
+    .map((href) => {
+      const name = escape(metaName.value);
+      if (href.includes(templateSearch)) {
+        href = href.replace(templateSearch, name);
+      } else {
+        href += name;
+      }
 
-    return new URL(url)
-  }
-  catch (e) {
-    console.error({ e })
-    return { host: 'error' }
-  }
-}))
+      return {
+        href,
+        host: getUrlHost(href),
+        favicon: getFaviconUrl(href),
+      };
+    });
+});
 </script>
 
 <template>
   <teleport v-if="!disableExtension && el" :to="el" defer>
     <div
-      v-for="site of sites" :key="site.toString()"
+      v-for="{ href, host, favicon } of sites"
+      :key="href"
       class="b-external_link official_site b-menu-line shiki-search-extension"
     >
       <a
-        v-if="site"
-        :href="site.toString()"
-        :style="{ '--b-link-icon': `url(${getIconUrl(site.toString())})` }"
+        :href="href"
+        :style="{ '--b-link-icon': `url(${favicon})` }"
         class="b-link"
       >
-        {{ site.host }}
+        {{ host }}
       </a>
     </div>
   </teleport>

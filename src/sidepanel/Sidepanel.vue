@@ -1,192 +1,214 @@
 <script lang="ts" setup>
-import {useArrayUnique} from "@vueuse/core";
-import {disableExtension, sitesStorage} from '~/logic'
-import {templateSearch} from '~/common/consts'
-import {getIconUrl} from "~/utils/getIconUrl";
+import { useArrayUnique } from "@vueuse/core";
+import { disableExtension, sitesStorage } from "~/logic";
+import { templateSearch } from "~/common/consts";
+import { getFaviconUrl } from "~/utils/getFaviconUrl";
+import { isUrlEqual } from "~/utils/isUrlEqual";
+import { getUrlHost } from "~/utils/getUrlHost";
+import { fixUrlProtocol } from "~/utils/fixUrlProtocol";
 
-const templateSearchValue = 'gurren%20lagann'
-const templateSearchValueRaw = 'gurren lagann'
+const templateSearchValue = "gurren%20lagann";
+const templateSearchValueRaw = "gurren lagann";
 const suggestions = [
-  '/search?q=',
-  '/search?query=',
-  '/find?query=',
-  '/lookup?search=',
-  '/query?=',
-  '/forum/tracker.php?nm=',
-]
+  "/search?q=",
+  "/search?query=",
+  "/find?query=",
+  "/lookup?search=",
+  "/query?=",
+  "/forum/tracker.php?nm=",
+];
 const suggestionTemplates = [
   {
-    test: (url: string) => url.includes('tracker.') || url.includes('lab.'),
-    value: '/forum/tracker.php?nm=',
+    test: (url: string) => url.includes("tracker.") || url.includes("lab."),
+    value: "/forum/tracker.php?nm=",
   },
-]
+];
 
-const newSite = ref('')
-const checkIndex = ref(0)
-const checkSite = ref('')
-const checkSuggestion = ref('')
-const checkSiteAndSuggestion = computed(() => `${checkSite.value}${checkSuggestion.value}`)
-const checkSuggestions = useArrayUnique(() => ([...suggestionTemplates.filter(x => x.test(checkSite.value)).map(x => x.value), ...suggestions]))
-const customSearchPath = ref('')
+const newSite = ref("");
+const checkIndex = ref(0);
+const checkSite = ref("");
+const checkSuggestion = ref("");
+const checkSiteAndSuggestion = computed(
+  () => `${checkSite.value}${checkSuggestion.value}`,
+);
+const checkSiteAndSuggestionAndTemplate = computed(
+  () => checkSiteAndSuggestion.value + templateSearchValue,
+);
+const checkSuggestions = useArrayUnique(() => [
+  ...suggestionTemplates
+    .filter((x) => x.test(checkSite.value))
+    .map((x) => x.value),
+  ...suggestions,
+]);
+const customSearchPath = ref("");
 
 function getNextSuggestion() {
-  const suggestion = checkSuggestions.value[checkIndex.value]
-  checkIndex.value++
-  return suggestion
+  const suggestion = checkSuggestions.value[checkIndex.value];
+  checkIndex.value++;
+  return suggestion;
 }
 
 function addSite() {
-  let site = newSite.value
+  let site = newSite.value;
   if (!site) {
-    return
+    return;
   }
 
-  resetAdd()
-  if (!site.startsWith('http://') && !site.startsWith('https://')) {
-    site = `https://${site}`
-  }
+  resetAdd();
+  site = fixUrlProtocol(site);
 
   if (site.includes(templateSearch)) {
-    onSave(site)
-    return
+    onSave(site);
+    return;
   }
 
-  checkSite.value = site
-  onCheckNext()
+  checkSite.value = site;
+  onCheckNext();
 }
 
 function resetAdd() {
-  newSite.value = ''
-  checkSite.value = ''
-  checkIndex.value = 0
-  checkSuggestion.value = ''
+  newSite.value = "";
+  checkSite.value = "";
+  checkIndex.value = 0;
+  checkSuggestion.value = "";
+  customSearchPath.value = "";
 }
 
 function onCheckNext() {
-  checkSuggestion.value = getNextSuggestion()
+  checkSuggestion.value = getNextSuggestion();
   if (checkSuggestion.value) {
-    window.open(checkSiteAndSuggestion.value + templateSearchValue, '_blank')
+    window.open(checkSiteAndSuggestionAndTemplate.value, "_blank");
   }
 }
 
 function onSave(site: string) {
-  sitesStorage.value.push(site)
-  resetAdd()
+  sitesStorage.value.push(site);
+  resetAdd();
 }
 
-declare const chrome: any
+declare const chrome: any;
 
-async function nextUrl() {
-  try {
-    const api = typeof browser !== 'undefined' ? browser : chrome;
-    const [tab] = await api.tabs.query({
-      active: true,
-      lastFocusedWindow: true
-    });
+async function removeTab() {
+  const api = browser || chrome;
+  const [tab] = await api.tabs.query({
+    active: true,
+    lastFocusedWindow: true,
+  });
 
-    if (!tab?.id) return;
+  if (!tab?.id) return;
 
-    if (checkSiteAndSuggestion.value === tab.url || checkSiteAndSuggestion.value === tab.pendingUrl) {
-      await api.tabs.remove(tab.id);
-    }
+  const { url, pendingUrl } = tab;
 
-    onCheckNext();
-  } catch (error) {
-    console.error('Error in nextUrl:', error);
+  if (
+    (url && isUrlEqual(checkSiteAndSuggestionAndTemplate.value, url)) ||
+    (pendingUrl &&
+      isUrlEqual(checkSiteAndSuggestionAndTemplate.value, pendingUrl)) ||
+    (!pendingUrl && url === "about:blank")
+  ) {
+    await api.tabs.remove(tab.id);
   }
 }
 
-function saveCustomUrl() {
+async function nextUrl() {
+  try {
+    await removeTab();
+    onCheckNext();
+  } catch (error: any) {
+    console.error("Error in nextUrl:", error);
+  }
+}
+
+async function saveCustomUrl() {
   if (customSearchPath.value) {
-    sitesStorage.value.push(customSearchPath.value)
-    customSearchPath.value = ''
+    sitesStorage.value.push(fixUrlProtocol(customSearchPath.value));
+    await removeTab();
+    resetAdd();
   }
 }
 
 function onDelete(site: string) {
-  if (!confirm(`Удалить ${site}?`)) return
+  if (!confirm(`Удалить ${site}?`)) return;
 
-  sitesStorage.value = sitesStorage.value.filter(x => x !== site)
+  sitesStorage.value = sitesStorage.value.filter((x) => x !== site);
 }
-
 
 function getTemplateUrl(site: string) {
-  return site.replace(templateSearch, templateSearchValue)
+  return site.replace(templateSearch, templateSearchValue);
 }
-
-function getHostUrl(site: string) {
-  return new URL(site).host
-}
-
 </script>
 
 <template>
   <div class="shiki-search-extension-side-panel">
     <div class="shiki-search-extension-side-panel__form">
       <div class="form-group">
-        <h1 class="header-1">
-          Введите URL сайта
-        </h1>
+        <h1 class="header-1">Введите URL сайта</h1>
         <label for="new-site">
           Например: google.com/search?q={{ templateSearch }}
         </label>
         <div class="url-row">
-          <VarInput id="new-site"
-                    v-model="newSite"
-                    :placeholder="`google.com/search?q=${templateSearch}`"
-                    clearable
-                    type="text"
+          <VarInput
+            id="new-site"
+            v-model="newSite"
+            :placeholder="`google.com/search?q=${templateSearch}`"
+            clearable
+            type="text"
           />
-          <VarButton :disabled="!newSite.length" type="success" @click="addSite">
+          <VarButton
+            :disabled="!newSite.length"
+            type="success"
+            @click="addSite"
+          >
             Добавить
           </VarButton>
         </div>
       </div>
-      <VarDivider/>
-      <div v-if="checkSuggestion"
-           class="url-suggestion"
-      >
-        <h3>Ваша ссылка не содержит {{ templateSearch }}, поэтому попробуем подобрать ссылку автоматически. Попытка
-          поиска:<br> {{ checkSiteAndSuggestion + templateSearch }} <br> Нашёлся ли {{ templateSearchValueRaw }}?</h3>
-        <div style="display: flex; gap: 0.5rem;">
+      <VarDivider />
+      <div v-if="checkSuggestion" class="url-suggestion">
+        <h3>
+          Ваша ссылка не содержит {{ templateSearch }}, поэтому попробуем
+          подобрать ссылку автоматически. Попытка поиска:<br />
+          {{ checkSiteAndSuggestion + templateSearch }} <br />
+          Нашёлся ли {{ templateSearchValueRaw }}?
+        </h3>
+
+        <div style="display: flex; gap: 0.5rem">
           <VarButton type="primary" @click="onSave(checkSiteAndSuggestion)">
             Да
           </VarButton>
-          <VarButton type="warning" @click="nextUrl">
-            Нет
-          </VarButton>
-          <VarButton type="danger" @click="resetAdd()">
-            Отмена
+          <VarButton type="warning" @click="nextUrl"> Нет</VarButton>
+          <VarButton type="danger" @click="resetAdd()"> Отмена</VarButton>
+        </div>
+      </div>
+      <div
+        v-if="checkIndex > checkSuggestions.length"
+        style="padding-top: 0.5rem"
+      >
+        <h3>Все предсказанные варианты не сработали :(</h3>
+        <p>
+          Пожалуйста, введите полную ссылку (без текста или с таким же как в
+          примере). Пример:
+          <code> google.com/search?q={{ templateSearch }} </code>
+        </p>
+
+        <div class="url-row">
+          <VarInput
+            v-model="customSearchPath"
+            placeholder="Полный путь"
+            type="text"
+          />
+          <VarButton type="primary" @click="saveCustomUrl">
+            Сохранить
           </VarButton>
         </div>
       </div>
-      <div v-if="checkIndex > checkSuggestions.length" style="padding-top: 0.5rem;">
-        <h3>Все предсказанные варианты не сработали :(</h3>
-        <p>
-          Пожалуйста, введите полную ссылку (без текста или с таким же как в примере).
-          Пример:
-          <code>
-            google.com/search?q={{ templateSearch }}
-          </code>
-        </p>
-        <VarInput v-model="customSearchPath" placeholder="Полный путь" type="text"/>
-        <VarButton type="primary" @click="saveCustomUrl">
-          Сохранить
-        </VarButton>
-      </div>
       <div v-if="sitesStorage.length" class="save-sites">
-        <h2 class="header-2">
-          Сохранённые сайты
-        </h2>
+        <h2 class="header-2">Сохранённые сайты</h2>
         <div class="save-sites__items">
           <template v-for="site in sitesStorage" :key="site">
             <div class="save-sites__item">
-              <VarIcon :name="getIconUrl(site)"/>
-              <VarLink
-                  :href="getTemplateUrl(site)"
-                  class="site-link"
-              >
-                {{ getHostUrl(site) }}
+              <VarIcon :name="getFaviconUrl(site)" />
+              <VarLink :href="getTemplateUrl(site)" class="site-link">
+                {{ getUrlHost(site) }}
               </VarLink>
               <VarButton icon-container round type="danger">
                 <VarIcon name="close-circle" @click="onDelete(site)"></VarIcon>
@@ -196,7 +218,9 @@ function getHostUrl(site: string) {
         </div>
       </div>
 
-      <VarCheckbox v-model="disableExtension" style="padding-top: 0.5rem;">Отключить расширение</VarCheckbox>
+      <VarCheckbox v-model="disableExtension" style="padding-top: 0.5rem">
+        Отключить расширение
+      </VarCheckbox>
     </div>
   </div>
 </template>
@@ -240,7 +264,7 @@ function getHostUrl(site: string) {
     align-items: center;
     gap: 20px;
 
-    #new-site {
+    .var-input {
       width: 100%;
     }
   }
@@ -267,7 +291,6 @@ function getHostUrl(site: string) {
       padding-block: 24px;
       padding-right: 18px;
       height: 48px;
-
     }
 
     .site-link {
