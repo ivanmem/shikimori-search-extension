@@ -77,12 +77,23 @@ function onSave(site: string) {
 declare const chrome: any
 
 async function nextUrl() {
-  const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true})
-  if (checkSiteAndSuggestion.value === tab.url || checkSiteAndSuggestion.value === tab.pendingUrl) {
-    chrome.tabs.remove(tab.id)
-  }
+  try {
+    const api = typeof browser !== 'undefined' ? browser : chrome;
+    const [tab] = await api.tabs.query({
+      active: true,
+      lastFocusedWindow: true
+    });
 
-  onCheckNext()
+    if (!tab?.id) return;
+
+    if (checkSiteAndSuggestion.value === tab.url || checkSiteAndSuggestion.value === tab.pendingUrl) {
+      await api.tabs.remove(tab.id);
+    }
+
+    onCheckNext();
+  } catch (error) {
+    console.error('Error in nextUrl:', error);
+  }
 }
 
 function saveCustomUrl() {
@@ -227,6 +238,11 @@ function getHostUrl(site: string) {
     padding-top: 0.5rem;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
+
+    #new-site {
+      width: 100%;
+    }
   }
 
   .save-sites {

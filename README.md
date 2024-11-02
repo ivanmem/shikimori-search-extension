@@ -16,7 +16,6 @@ A [Vite](https://vitejs.dev/) powered WebExtension ([Chrome](https://developer.c
 - ⚡️ **Instant HMR** - используйте **Vite** на dev (больше никаких обновлений!)
 - 🥝 Vue 3 - API композиции, синтаксис [`<script setup>`](https://github.com/vuejs/rfcs/blob/master/active-rfcs/0040-script-setup.md) и многое другое!
 - 💬 Эффективные коммуникации - на базе [`webext-bridge`](https://github.com/antfu/webext-bridge) и хранилища [VueUse](https://github.com/antfu/vueuse)
-- 🌈 [UnoCSS](https://github.com/unocss/unocss) - мгновенный движок Atomic CSS по требованию.
 - 🦾 [TypeScript](https://www.typescriptlang.org/) - безопасность типов
 - 📦 [Автоматический импорт компонентов](./src/components)
 - 🌟 [Icons](./src/components) - прямой доступ к иконкам из любого набора иконок
@@ -41,10 +40,6 @@ A [Vite](https://vitejs.dev/) powered WebExtension ([Chrome](https://developer.c
 ### Vue Plugins
 
 - [VueUse](https://github.com/antfu/vueuse) - коллекция полезных API-интерфейсов композиции
-
-### UI Frameworks
-
-- [UnoCSS](https://github.com/unocss/unocss) - мгновенный движок Atomic CSS по требованию
 
 ### Coding Style
 
