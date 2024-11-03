@@ -9,18 +9,43 @@ import { fixUrlProtocol } from "~/utils/fixUrlProtocol";
 
 const templateSearchValue = "gurren%20lagann";
 const templateSearchValueRaw = "gurren lagann";
+
 const suggestions = [
-  "/search?q=",
   "/search?query=",
+  "/search?q=",
+  "/?q=",
+  "/query?=",
+  "/search/",
+  "/search/?text=",
   "/find?query=",
   "/lookup?search=",
-  "/query?=",
   "/forum/tracker.php?nm=",
-];
-const suggestionTemplates = [
+  "/browse.php?s=",
+] as const;
+
+const suggestionTemplates: {
+  test: (url: string) => boolean;
+  value: (typeof suggestions)[number];
+}[] = [
+  {
+    test: (url: string) => url.includes("yandex."),
+    value: "/search/?text=",
+  },
+  {
+    test: (url: string) => url.includes("nyaa."),
+    value: "/?q=",
+  },
   {
     test: (url: string) => url.includes("tracker.") || url.includes("lab."),
     value: "/forum/tracker.php?nm=",
+  },
+  {
+    test: (url: string) => url.includes("zal."),
+    value: "/browse.php?s=",
+  },
+  {
+    test: (url: string) => url.includes("ben."),
+    value: "/search/",
   },
 ];
 
