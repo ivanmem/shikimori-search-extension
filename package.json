@@ -1,7 +1,7 @@
 {
   "name": "shikimori-search-extension",
   "displayName": "Shiki Search",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "packageManager": "pnpm@9.7.1",
   "description": "Расширение для добавления поисковых кнопок на сайте Shikimori",
@@ -61,11 +61,11 @@
     "unplugin-auto-import": "0.18.3",
     "unplugin-icons": "0.20.0",
     "unplugin-vue-components": "0.27.4",
-    "vite": "5.4.10",
-    "vitest": "2.1.4",
-    "vue": "3.5.12",
+    "vite": "5.4.21",
+    "vitest": "2.1.9",
+    "vue": "3.5.27",
     "vue-demi": "0.14.10",
-    "web-ext": "^8.2.0",
+    "web-ext": "8.10.0",
     "webext-bridge": "^6.0.1",
     "webextension-polyfill": "^0.12.0"
   }

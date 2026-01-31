@@ -1,5 +1,5 @@
 # Описание
-Расширение для сайта <a href="https://shikimori.one/">Shikimori</a>, которое заменяет содержимое блока `НА ДРУГИХ САЙТАХ` на ваши поисковые системы.
+Расширение для сайта <a href="https://shiki.one/">Shikimori</a>, которое заменяет содержимое блока `НА ДРУГИХ САЙТАХ` на ваши поисковые системы.
 
 <img src="docs/external-links.png" alt="external links" width="35%">
 
