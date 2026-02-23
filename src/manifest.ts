@@ -47,7 +47,11 @@ export async function getManifest() {
     host_permissions: ["*://*/*"],
     content_scripts: [
       {
-        matches: ["https://*.shikimori.one/*", "https://*.shiki.one/*"],
+        matches: [
+          "https://*.shikimori.one/*",
+          "https://*.shiki.one/*",
+          "https://*.shikimori.io/*",
+        ],
         js: ["dist/contentScripts/index.global.js"],
       },
     ],
