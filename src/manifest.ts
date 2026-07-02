@@ -54,6 +54,7 @@ export async function getManifest() {
           "https://*.shikimori.rip/*",
           "https://*.shikimori.org/*",
           "https://*.shikimori.me/*",
+          "https://*.shikimori.moe/*",
         ],
         js: ["dist/contentScripts/index.global.js"],
       },
