@@ -5,6 +5,9 @@ import { templateSearch } from "~/common/consts";
 import { getFaviconUrl } from "~/utils/getFaviconUrl";
 import { getUrlHost } from "~/utils/getUrlHost";
 
+defineProps<{ showSettingsButton?: boolean }>();
+defineEmits<{ openSettings: [] }>();
+
 const { el, metaName } = useShikimoriMetaName();
 
 const sites = computed(() => {
@@ -40,6 +43,14 @@ const sites = computed(() => {
         class="b-link"
       >
         {{ host }}
+      </a>
+    </div>
+    <div
+      v-if="showSettingsButton"
+      class="b-menu-line shiki-search-extension__settings"
+    >
+      <a href="#" class="b-link" @click.prevent="$emit('openSettings')">
+        ⚙ Настройки поиска
       </a>
     </div>
   </teleport>

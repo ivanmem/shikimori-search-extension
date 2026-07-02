@@ -2,6 +2,7 @@ import fs from "fs-extra";
 import type { Manifest } from "webextension-polyfill";
 import type PkgType from "../package.json";
 import { isDev, isFirefox, port, r } from "../scripts/utils";
+import { shikimoriMatches } from "./common/matches";
 
 interface WebExtensionChrome {
   side_panel?: { default_path: string };
@@ -47,15 +48,7 @@ export async function getManifest() {
     host_permissions: ["*://*/*"],
     content_scripts: [
       {
-        matches: [
-          "https://*.shikimori.one/*",
-          "https://*.shiki.one/*",
-          "https://*.shikimori.io/*",
-          "https://*.shikimori.rip/*",
-          "https://*.shikimori.org/*",
-          "https://*.shikimori.me/*",
-          "https://*.shikimori.moe/*",
-        ],
+        matches: shikimoriMatches,
         js: ["dist/contentScripts/index.global.js"],
       },
     ],

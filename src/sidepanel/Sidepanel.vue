@@ -3,9 +3,9 @@ import { useArrayUnique } from "@vueuse/core";
 import { disableExtension, sitesStorage } from "~/logic";
 import { templateSearch } from "~/common/consts";
 import { getFaviconUrl } from "~/utils/getFaviconUrl";
-import { isUrlEqual } from "~/utils/isUrlEqual";
 import { getUrlHost } from "~/utils/getUrlHost";
 import { fixUrlProtocol } from "~/utils/fixUrlProtocol";
+import { checkTab } from "#platform/checkTab";
 
 const templateSearchValue = "gurren%20lagann";
 const templateSearchValueRaw = "gurren lagann";
@@ -102,7 +102,7 @@ function resetAdd() {
 function onCheckNext() {
   checkSuggestion.value = getNextSuggestion();
   if (checkSuggestion.value) {
-    window.open(checkSiteAndSuggestionAndTemplate.value, "_blank");
+    checkTab.open(checkSiteAndSuggestionAndTemplate.value);
   }
 }
 
@@ -111,32 +111,9 @@ function onSave(site: string) {
   resetAdd();
 }
 
-declare const chrome: any;
-
-async function removeTab() {
-  const api = browser || chrome;
-  const [tab] = await api.tabs.query({
-    active: true,
-    lastFocusedWindow: true,
-  });
-
-  if (!tab?.id) return;
-
-  const { url, pendingUrl } = tab;
-
-  if (
-    (url && isUrlEqual(checkSiteAndSuggestionAndTemplate.value, url)) ||
-    (pendingUrl &&
-      isUrlEqual(checkSiteAndSuggestionAndTemplate.value, pendingUrl)) ||
-    (!pendingUrl && url === "about:blank")
-  ) {
-    await api.tabs.remove(tab.id);
-  }
-}
-
 async function nextUrl() {
   try {
-    await removeTab();
+    await checkTab.closeIfMatches(checkSiteAndSuggestionAndTemplate.value);
     onCheckNext();
   } catch (error: any) {
     console.error("Error in nextUrl:", error);
@@ -146,7 +123,7 @@ async function nextUrl() {
 async function saveCustomUrl() {
   if (customSearchPath.value) {
     sitesStorage.value.push(fixUrlProtocol(customSearchPath.value));
-    await removeTab();
+    await checkTab.closeIfMatches(checkSiteAndSuggestionAndTemplate.value);
     resetAdd();
   }
 }
@@ -256,9 +233,22 @@ function getTemplateUrl(site: string) {
   display: flex;
   overflow: auto;
   flex-direction: column;
+  color: var(--color-text) !important;
 
   * {
     box-sizing: border-box;
+  }
+
+  // модалка внедряется прямо в разметку Shikimori, а не в Shadow DOM,
+  // поэтому глобальные стили сайта (приглушённый цвет для h3/p) могут
+  // просвечивать через каскад — фиксируем цвет текста явно
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  label {
+    color: inherit !important;
   }
 
   &__form {

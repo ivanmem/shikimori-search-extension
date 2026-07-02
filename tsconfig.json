@@ -14,10 +14,13 @@
     ],
     "baseUrl": ".",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "paths": {
       "~/*": [
         "src/*"
+      ],
+      "#platform/*": [
+        "src/platform/extension/*"
       ]
     },
     "resolveJsonModule": true,
