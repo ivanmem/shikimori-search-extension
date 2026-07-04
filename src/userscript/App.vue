@@ -7,7 +7,7 @@ import { showSettings } from "./state";
 
 <template>
   <ContentApp show-settings-button @open-settings="showSettings = true" />
-  <VarPopup v-model:show="showSettings" position="center" teleport="body">
+  <VarPopup v-model:show="showSettings" position="center" :teleport="false">
     <var-style-provider
       :style-vars="Themes.dark"
       class="shiki-search-extension-userscript-settings"
