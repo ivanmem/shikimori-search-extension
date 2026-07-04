@@ -128,10 +128,48 @@ async function saveCustomUrl() {
   }
 }
 
-function onDelete(site: string) {
-  if (!confirm(`Удалить ${site}?`)) return;
+const editingSite = ref<string | null>(null);
+const editingValue = ref("");
+const isEditValid = computed(() => {
+  const updated = fixUrlProtocol(editingValue.value);
+  if (!updated.includes(templateSearch)) {
+    return false;
+  }
 
-  sitesStorage.value = sitesStorage.value.filter((x) => x !== site);
+  return !sitesStorage.value.some(
+    (x) => x !== editingSite.value && x === updated,
+  );
+});
+
+function startEdit(site: string) {
+  editingSite.value = site;
+  editingValue.value = site;
+}
+
+function cancelEdit() {
+  editingSite.value = null;
+  editingValue.value = "";
+}
+
+function saveEdit() {
+  if (!isEditValid.value) {
+    return;
+  }
+
+  const updated = fixUrlProtocol(editingValue.value);
+  sitesStorage.value = sitesStorage.value.map((x) =>
+    x === editingSite.value ? updated : x,
+  );
+  cancelEdit();
+}
+
+function onDelete() {
+  if (!editingSite.value || !confirm(`Удалить ${editingSite.value}?`)) return;
+
+  sitesStorage.value = sitesStorage.value.filter(
+    (x) => x !== editingSite.value,
+  );
+  cancelEdit();
 }
 
 function getTemplateUrl(site: string) {
@@ -212,10 +250,61 @@ function getTemplateUrl(site: string) {
               <VarLink :href="getTemplateUrl(site)" class="site-link">
                 {{ getUrlHost(site) }}
               </VarLink>
-              <VarButton icon-container round type="danger">
-                <VarIcon name="close-circle" @click="onDelete(site)"></VarIcon>
+              <VarButton
+                icon-container
+                round
+                type="primary"
+                @click="startEdit(site)"
+              >
+                <svg
+                  class="edit-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"
+                  />
+                </svg>
               </VarButton>
             </div>
+            <Transition>
+              <div
+                v-if="editingSite === site"
+                class="save-sites__edit-wrapper"
+              >
+                <div class="save-sites__edit">
+                  <label :for="`edit-site-${site}`">
+                    Полный URL с {{ templateSearch }}
+                  </label>
+                  <VarInput
+                    :id="`edit-site-${site}`"
+                    v-model="editingValue"
+                    :placeholder="`google.com/search?q=${templateSearch}`"
+                    clearable
+                    type="text"
+                  />
+                  <div class="url-row">
+                    <VarButton
+                      :disabled="!isEditValid"
+                      type="success"
+                      @click="saveEdit"
+                    >
+                      Сохранить
+                    </VarButton>
+                    <VarButton type="danger" @click="onDelete">
+                      Удалить
+                    </VarButton>
+                    <VarButton type="warning" @click="cancelEdit">
+                      Отмена
+                    </VarButton>
+                  </div>
+                </div>
+              </div>
+            </Transition>
           </template>
         </div>
       </div>
@@ -295,17 +384,54 @@ function getTemplateUrl(site: string) {
       overflow-y: scroll;
       flex-direction: column;
       scrollbar-gutter: stable both-edges;
-      height: 200px;
+      max-height: 320px;
     }
 
     &__item {
       display: flex;
       overflow: hidden;
+      flex-shrink: 0;
       gap: 1rem;
       align-items: center;
       padding-block: 24px;
       padding-right: 18px;
       height: 48px;
+    }
+
+    &__edit-wrapper {
+      display: grid;
+      overflow: hidden;
+      flex-shrink: 0;
+      grid-template-rows: 1fr;
+      opacity: 1;
+      transition:
+        grid-template-rows 0.25s ease,
+        opacity 0.25s ease;
+
+      &.v-enter-from,
+      &.v-leave-to {
+        grid-template-rows: 0fr;
+        opacity: 0;
+      }
+    }
+
+    &__edit {
+      display: flex;
+      overflow: hidden;
+      min-height: 0;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding-bottom: 1rem;
+      padding-right: 18px;
+
+      .url-row {
+        gap: 0.5rem;
+      }
+    }
+
+    .edit-icon {
+      width: 1em;
+      height: 1em;
     }
 
     .site-link {
