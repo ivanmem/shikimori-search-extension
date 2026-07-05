@@ -1,6 +1,6 @@
 import { onUnmounted, ref, watch } from "vue";
 import { useBrowserLocation, useMutationObserver } from "@vueuse/core";
-import { disableExtension } from "~/logic";
+import { disableExtension, hideOriginalLinks, pinSearchBlock } from "~/logic";
 import { onWebExtensionStoragesMounted } from "~/composables/useWebExtensionStorage";
 
 export function useShikimoriMetaName() {
@@ -10,6 +10,12 @@ export function useShikimoriMetaName() {
   let init = false;
 
   watch(location, updateMetaInfo, { deep: true });
+
+  // при включении настройки применяем действие сразу, без перезагрузки страницы
+  watch([pinSearchBlock, hideOriginalLinks], () => {
+    init = false;
+    updateMetaInfo();
+  });
 
   onWebExtensionStoragesMounted(() => {
     window.addEventListener("popstate", updateMetaInfo);
@@ -71,10 +77,15 @@ export function useShikimoriMetaName() {
       targetEl.classList.add("block-shiki-search-extension");
     }
 
-    targetEl.parentNode?.prepend(targetEl);
-    targetEl.querySelectorAll(".b-external_link").forEach((link) => {
-      link.remove();
-    });
+    if (pinSearchBlock.value) {
+      targetEl.parentNode?.prepend(targetEl);
+    }
+
+    if (hideOriginalLinks.value) {
+      targetEl.querySelectorAll(".b-external_link").forEach((link) => {
+        link.remove();
+      });
+    }
     el.value = targetEl ?? undefined;
     init = true;
   }

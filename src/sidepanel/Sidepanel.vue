@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import { useArrayUnique } from "@vueuse/core";
-import { disableExtension, sitesStorage } from "~/logic";
+import {
+  disableExtension,
+  hideOriginalLinks,
+  pinSearchBlock,
+  sitesStorage,
+} from "~/logic";
 import { templateSearch } from "~/common/consts";
 import { getFaviconUrl } from "~/utils/getFaviconUrl";
 import { getUrlHost } from "~/utils/getUrlHost";
@@ -180,8 +185,10 @@ function getTemplateUrl(site: string) {
 <template>
   <div class="shiki-search-extension-side-panel">
     <div class="shiki-search-extension-side-panel__form">
-      <div class="form-group">
-        <h1 class="header-1">Введите URL сайта</h1>
+      <h1 class="panel-title">Настройки поиска</h1>
+
+      <section class="panel-card">
+        <h2 class="panel-card__title">Добавление сайта</h2>
         <label for="new-site">
           Например: google.com/search?q={{ templateSearch }}
         </label>
@@ -201,48 +208,48 @@ function getTemplateUrl(site: string) {
             Добавить
           </VarButton>
         </div>
-      </div>
-      <VarDivider />
-      <div v-if="checkSuggestion" class="url-suggestion">
-        <h3>
-          Ваша ссылка не содержит {{ templateSearch }}, поэтому попробуем
-          подобрать ссылку автоматически. Попытка поиска:<br />
-          {{ checkSiteAndSuggestion + templateSearch }} <br />
-          Нашёлся ли {{ templateSearchValueRaw }}?
-        </h3>
+        <div v-if="checkSuggestion" class="url-suggestion">
+          <h3>
+            Ваша ссылка не содержит {{ templateSearch }}, поэтому попробуем
+            подобрать ссылку автоматически. Попытка поиска:<br />
+            {{ checkSiteAndSuggestion + templateSearch }} <br />
+            Нашёлся ли {{ templateSearchValueRaw }}?
+          </h3>
 
-        <div style="display: flex; gap: 0.5rem">
-          <VarButton type="primary" @click="onSave(checkSiteAndSuggestion)">
-            Да
-          </VarButton>
-          <VarButton type="warning" @click="nextUrl"> Нет</VarButton>
-          <VarButton type="danger" @click="resetAdd()"> Отмена</VarButton>
+          <div style="display: flex; gap: 0.5rem">
+            <VarButton type="primary" @click="onSave(checkSiteAndSuggestion)">
+              Да
+            </VarButton>
+            <VarButton type="warning" @click="nextUrl"> Нет</VarButton>
+            <VarButton type="danger" @click="resetAdd()"> Отмена</VarButton>
+          </div>
         </div>
-      </div>
-      <div
-        v-if="checkIndex > checkSuggestions.length"
-        style="padding-top: 0.5rem"
-      >
-        <h3>Все предсказанные варианты не сработали :(</h3>
-        <p>
-          Пожалуйста, введите полную ссылку (без текста или с таким же как в
-          примере). Пример:
-          <code> google.com/search?q={{ templateSearch }} </code>
-        </p>
+        <div
+          v-if="checkIndex > checkSuggestions.length"
+          style="padding-top: 0.5rem"
+        >
+          <h3>Все предсказанные варианты не сработали :(</h3>
+          <p>
+            Пожалуйста, введите полную ссылку (без текста или с таким же как в
+            примере). Пример:
+            <code> google.com/search?q={{ templateSearch }} </code>
+          </p>
 
-        <div class="url-row">
-          <VarInput
-            v-model="customSearchPath"
-            placeholder="Полный путь"
-            type="text"
-          />
-          <VarButton type="primary" @click="saveCustomUrl">
-            Сохранить
-          </VarButton>
+          <div class="url-row">
+            <VarInput
+              v-model="customSearchPath"
+              placeholder="Полный путь"
+              type="text"
+            />
+            <VarButton type="primary" @click="saveCustomUrl">
+              Сохранить
+            </VarButton>
+          </div>
         </div>
-      </div>
-      <div v-if="sitesStorage.length" class="save-sites">
-        <h2 class="header-2">Сохранённые сайты</h2>
+      </section>
+
+      <section v-if="sitesStorage.length" class="panel-card save-sites">
+        <h2 class="panel-card__title">Сохранённые сайты</h2>
         <div class="save-sites__items">
           <template v-for="site in sitesStorage" :key="site">
             <div class="save-sites__item">
@@ -307,11 +314,42 @@ function getTemplateUrl(site: string) {
             </Transition>
           </template>
         </div>
-      </div>
+      </section>
 
-      <VarCheckbox v-model="disableExtension" style="padding-top: 0.5rem">
-        Отключить расширение
-      </VarCheckbox>
+      <section class="panel-card">
+        <h2 class="panel-card__title">Поведение</h2>
+        <div class="behavior-row">
+          <div class="behavior-row__text">
+            <span class="behavior-row__label">
+              Закреплять раздел ссылок вверху страницы
+            </span>
+            <span class="behavior-row__note">
+              Блок со ссылками поиска поднимается в начало колонки
+            </span>
+          </div>
+          <VarSwitch v-model="pinSearchBlock" />
+        </div>
+        <div class="behavior-row">
+          <div class="behavior-row__text">
+            <span class="behavior-row__label">
+              Скрывать стандартные ссылки Шикимори
+            </span>
+            <span class="behavior-row__note">
+              Убирает встроенные внешние ссылки из блока
+            </span>
+          </div>
+          <VarSwitch v-model="hideOriginalLinks" />
+        </div>
+        <div class="behavior-row">
+          <div class="behavior-row__text">
+            <span class="behavior-row__label">Отключить расширение</span>
+            <span class="behavior-row__note">
+              Полностью останавливает работу на страницах сайта
+            </span>
+          </div>
+          <VarSwitch v-model="disableExtension" />
+        </div>
+      </section>
     </div>
   </div>
 </template>
@@ -345,20 +383,51 @@ function getTemplateUrl(site: string) {
     overflow: auto;
     padding: 1rem;
     flex-direction: column;
+    gap: 0.75rem;
   }
 
-  .header-1 {
-    font-size: 1.125rem;
+  .panel-title {
+    font-size: 1.25rem;
     font-weight: 700;
     text-align: center;
   }
 
-  .header-2 {
-    padding-top: 1.25rem;
-    font-size: 1rem;
-    line-height: 1.5rem;
-    font-weight: 700;
-    text-align: center;
+  .panel-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--color-surface-container-high);
+
+    &__title {
+      font-size: 1rem;
+      line-height: 1.5rem;
+      font-weight: 700;
+    }
+  }
+
+  .behavior-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.375rem;
+
+    &__text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+
+    &__label {
+      font-weight: 500;
+    }
+
+    &__note {
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary, #999);
+    }
   }
 
   .url-row {
@@ -374,10 +443,7 @@ function getTemplateUrl(site: string) {
   }
 
   .save-sites {
-    display: flex;
     overflow: auto;
-    flex-direction: column;
-    gap: 0.75rem;
 
     &__items {
       display: flex;

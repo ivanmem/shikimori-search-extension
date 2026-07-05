@@ -18,10 +18,21 @@ import { showSettings } from "./state";
 </template>
 
 <style lang="scss">
+// собственный светлый фон контейнера попапа просвечивает в углах под тёмной
+// модалкой; переменные тёмной темы объявлены внутри var-style-provider и на
+// этом уровне ещё недоступны, поэтому просто делаем контейнер прозрачным
+.var-popup__content:has(> .shiki-search-extension-userscript-settings) {
+  border-radius: 16px;
+  background: transparent;
+}
+
 .shiki-search-extension-userscript-settings {
+  // тема попапа всегда тёмная — рисуем и системные скроллбары тёмными
+  color-scheme: dark;
   width: min(480px, 92vw);
   max-height: 85vh;
   overflow: auto;
+  border-radius: 16px;
   background: var(--color-body);
 }
 </style>
