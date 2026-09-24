@@ -6,4 +6,5 @@ export const shikimoriMatches = [
   "https://*.shikimori.org/*",
   "https://*.shikimori.me/*",
   "https://*.shikimori.moe/*",
+  "https://*.shikimori.live/*",
 ];
