@@ -39,7 +39,7 @@ const sites = computed(() => {
     >
       <a
         :href="href"
-        :style="{ '--b-link-icon': `url(${favicon})` }"
+        :style="favicon && { '--b-link-icon': `url(${favicon})` }"
         class="b-link"
       >
         {{ host }}
