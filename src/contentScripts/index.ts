@@ -3,6 +3,7 @@ import { onMessage } from 'webext-bridge/content-script'
 import { createApp } from 'vue'
 import App from './views/App.vue'
 import { setupApp } from '~/logic/common-setup'
+import { isShikimoriPage } from '~/common/isShikimoriPage'
 
 const styleEl = document.createElement('link')
 styleEl.setAttribute('rel', 'stylesheet')
@@ -19,6 +20,10 @@ function addAll() {
 
 // Firefox `browser.tabs.executeScript()` требует, чтобы скрипты возвращали примитивное значение
 (() => {
+  if (!isShikimoriPage()) {
+    return
+  }
+
   console.info('[vitesse-webext] Hello world from content script')
 
   // пример коммуникации: отправьте заголовок предыдущей вкладки с фоновой страницы
